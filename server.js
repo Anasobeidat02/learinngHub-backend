@@ -14,15 +14,15 @@ console.log("MONGODB_URI =", process.env.MONGODB_URI);
 
 
 // Middleware 
-const allowedOrigins = [
-  'https://learinng-hub-fronend.vercel.app', 
-  'http://localhost:8080',
-];
+// const allowedOrigins = [
+//   'https://learinng-hub-fronend.vercel.app', 
+//   'http://localhost:8080',
+// ];
 
-app.use(cors({
-  origin: allowedOrigins,
-  credentials: true
-}));
+// app.use(cors({
+//   origin: allowedOrigins,
+//   credentials: true
+// }));
 app.use(cors()); // بدل الـ allowedOrigins
 
 app.use(express.json());
