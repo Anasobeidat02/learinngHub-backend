@@ -1,0 +1,25 @@
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Dependencies
+node_modules/
+
+# dotenv environment variables file
+.env
+.env.local
+
+# Build / production artifacts
+dist/
+build/
+
+# IDE files
+.idea/
+.vscode/
+*.sublime-workspace
+
+# OS files
+.DS_Store
+Thumbs.db
