@@ -15,7 +15,7 @@ console.log("MONGODB_URI =", process.env.MONGODB_URI);
 
 // Middleware 
 const allowedOrigins = [
-  'https://learinng-hub-frontend.vercel.app', 
+  'https://learinng-hub-fronend.vercel.app', 
   'http://localhost:5000',
 ];
 
