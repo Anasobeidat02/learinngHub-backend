@@ -19,11 +19,11 @@ console.log("MONGODB_URI =", process.env.MONGODB_URI);
 //   'http://localhost:8080',
 // ];
 
-app.use(cors({
-  origin: 'https://learinng-hub-fronend.vercel.app',
-  credentials: true
-}));
-// app.use(cors()); // بدل الـ allowedOrigins
+// app.use(cors({
+//   origin: 'https://learinng-hub-fronend.vercel.app',
+//   credentials: true
+// }));
+app.use(cors()); // بدل الـ allowedOrigins
 
 app.use(express.json());
  
