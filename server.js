@@ -14,7 +14,16 @@ console.log("MONGODB_URI =", process.env.MONGODB_URI);
 
 
 // Middleware 
-app.use(cors());
+const allowedOrigins = [
+  'https://learinng-hub-frontend.vercel.app', 
+  'http://localhost:5000',
+];
+
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true
+}));
+
 app.use(express.json());
  
 // Basic route
