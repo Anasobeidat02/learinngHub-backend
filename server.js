@@ -1,6 +1,6 @@
-
+ 
 const express = require('express');
-const cors = require('cors');
+const cors = require('cors'); 
 require('dotenv').config();
 const connectDB = require('./db/connection');
 const { protect } = require('./middleware/authMiddleware');
@@ -38,6 +38,7 @@ app.use('/api/comments', require('./routes/comments'));
 app.use('/api/projects', require('./routes/projects'));
 app.use('/api/questions', require('./routes/questions'));
 app.use('/api/admins', require('./routes/admins'));
+app.use('/api/articles', require('./routes/articles'));
 
 // Error handling middleware
 app.use((err, req, res, next) => {
