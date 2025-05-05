@@ -62,15 +62,15 @@ const articleSchema = new mongoose.Schema({
 });
 
 // Create slug from title before saving
-articleSchema.pre('save', function(next) {
-  if (this.isModified('title')) {
-    this.slug = slugify(this.title, { lower: true, strict: true });
-  }
-  if (this.isModified()) {
-    this.updatedAt = Date.now();
-  }
-  next();
-});
+// articleSchema.pre('save', function(next) {
+//   if (this.isModified('title')) {
+//     this.slug = slugify(this.title, { lower: true, strict: true });
+//   }
+//   if (this.isModified()) {
+//     this.updatedAt = Date.now();
+//   }
+//   next();
+// });
 
 const Article = mongoose.model('Article', articleSchema);
 

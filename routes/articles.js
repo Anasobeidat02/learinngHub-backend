@@ -80,41 +80,75 @@ const express = require('express');
    // @route   PUT /api/articles/:id
    // @access  Private/Admin
    router.put('/:id', protect, async (req, res) => {
-     try {
-       const { title, description, content, requirements, useCases, libraries, language, icon, color } = req.body;
-       
-       const article = await Article.findById(req.params.id);
-       
-       if (!article) {
-         return res.status(404).json({ message: 'Article not found' });
-       }
-       
-       // Update slug if title is changed
-       if (title && title !== article.title) {
-         let slugTitle = title;
-         if (title === 'C++') slugTitle = 'cpp';
-         article.slug = slugify(slugTitle, { lower: true, strict: true });
-       }
-
-       article.title = title || article.title;
-       article.description = description || article.description;
-       article.content = content || article.content;
-       article.requirements = Array.isArray(requirements) ? requirements : requirements.split(',').map(req => req.trim());
-       article.useCases = Array.isArray(useCases) ? useCases : useCases.split(',').map(use => use.trim());
-       article.libraries = libraries || article.libraries;
-       article.language = language || article.language;
-       article.icon = icon || article.icon;
-       article.color = color || article.color;
-       article.updatedAt = Date.now();
-       
-       const updatedArticle = await article.save();
-       res.json(updatedArticle);
-     } catch (error) {
-       console.error('Error updating article:', error);
-       res.status(500).json({ message: 'Server error', error: error.message });
-     }
-   });
-
+    try {
+      console.log('Received PUT request with body:', req.body);
+      console.log('Article ID:', req.params.id);
+      
+      const { title, description, content, requirements, useCases, libraries, language, icon, color } = req.body;
+      
+      const article = await Article.findById(req.params.id);
+      
+      if (!article) {
+        return res.status(404).json({ message: 'Article not found' });
+      }
+      
+      console.log('Current article:', article);
+      
+      if (title && title !== article.title) {
+        let slugTitle = title;
+        if (title === 'C++') slugTitle = 'cpp';
+        const newSlug = slugify(slugTitle, { lower: true, strict: true });
+        
+        // تحقق إذا الـ slug موجود بالفعل
+        const existingArticle = await Article.findOne({ slug: newSlug, _id: { $ne: req.params.id } });
+        if (existingArticle) {
+          return res.status(400).json({ message: `Slug "${newSlug}" is already in use by another article` });
+        }
+        article.slug = newSlug;
+      }
+  
+      article.title = title || article.title;
+      article.description = description || article.description;
+      article.content = content || article.content;
+      
+      article.requirements = requirements
+        ? Array.isArray(requirements)
+          ? requirements
+          : typeof requirements === 'string' && requirements.trim()
+            ? requirements.split(',').map(req => req.trim())
+            : article.requirements
+        : article.requirements;
+      
+      article.useCases = useCases
+        ? Array.isArray(useCases)
+          ? useCases
+          : typeof useCases === 'string' && useCases.trim()
+            ? useCases.split(',').map(use => use.trim())
+            : article.useCases
+        : article.useCases;
+      
+      article.libraries = libraries !== undefined ? libraries : article.libraries;
+      article.language = language || article.language;
+      article.icon = icon || article.icon;
+      article.color = color || article.color;
+      article.updatedAt = Date.now();
+      
+      try {
+        const updatedArticle = await article.save();
+        console.log('Updated article:', updatedArticle);
+        res.json(updatedArticle);
+      } catch (validationError) {
+        console.error('Validation error during save:', validationError);
+        if (validationError.code === 11000) {
+          return res.status(400).json({ message: `Slug "${article.slug}" is already in use` });
+        }
+        return res.status(400).json({ message: 'Validation error', error: validationError.message });
+      }
+    } catch (error) {
+      console.error('Error updating article:', error);
+      res.status(500).json({ message: 'Server error', error: error.message });
+    }
+  });
    // @desc    Delete article
    // @route   DELETE /api/articles/:id
    // @access  Private/Admin
