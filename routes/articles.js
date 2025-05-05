@@ -99,7 +99,6 @@ const express = require('express');
         if (title === 'C++') slugTitle = 'cpp';
         const newSlug = slugify(slugTitle, { lower: true, strict: true });
         
-        // تحقق إذا الـ slug موجود بالفعل
         const existingArticle = await Article.findOne({ slug: newSlug, _id: { $ne: req.params.id } });
         if (existingArticle) {
           return res.status(400).json({ message: `Slug "${newSlug}" is already in use by another article` });
@@ -107,45 +106,55 @@ const express = require('express');
         article.slug = newSlug;
       }
   
-      article.title = title || article.title;
-      article.description = description || article.description;
-      article.content = content || article.content;
+      const updateData = {
+        title: title || article.title,
+        description: description || article.description,
+        content: content || article.content,
+        requirements: requirements
+          ? Array.isArray(requirements)
+            ? requirements
+            : typeof requirements === 'string' && requirements.trim()
+              ? requirements.split(',').map(req => req.trim())
+              : article.requirements
+          : article.requirements,
+        useCases: useCases
+          ? Array.isArray(useCases)
+            ? useCases
+            : typeof useCases === 'string' && useCases.trim()
+              ? useCases.split(',').map(use => use.trim())
+              : article.useCases
+          : article.useCases,
+        libraries: libraries !== undefined ? libraries : article.libraries,
+        language: language || article.language,
+        icon: icon || article.icon,
+        color: color || article.color,
+        updatedAt: Date.now(),
+        slug: article.slug
+      };
+  
+      console.log('Update data:', updateData);
+  
+      const updateResult = await Article.updateOne(
+        { _id: req.params.id },
+        { $set: updateData },
+        { runValidators: true }
+      );
       
-      article.requirements = requirements
-        ? Array.isArray(requirements)
-          ? requirements
-          : typeof requirements === 'string' && requirements.trim()
-            ? requirements.split(',').map(req => req.trim())
-            : article.requirements
-        : article.requirements;
+      console.log('Update result:', updateResult);
       
-      article.useCases = useCases
-        ? Array.isArray(useCases)
-          ? useCases
-          : typeof useCases === 'string' && useCases.trim()
-            ? useCases.split(',').map(use => use.trim())
-            : article.useCases
-        : article.useCases;
-      
-      article.libraries = libraries !== undefined ? libraries : article.libraries;
-      article.language = language || article.language;
-      article.icon = icon || article.icon;
-      article.color = color || article.color;
-      article.updatedAt = Date.now();
-      
-      try {
-        const updatedArticle = await article.save();
-        console.log('Updated article:', updatedArticle);
-        res.json(updatedArticle);
-      } catch (validationError) {
-        console.error('Validation error during save:', validationError);
-        if (validationError.code === 11000) {
-          return res.status(400).json({ message: `Slug "${article.slug}" is already in use` });
-        }
-        return res.status(400).json({ message: 'Validation error', error: validationError.message });
+      if (updateResult.modifiedCount === 0) {
+        console.log('No changes were applied to the article');
+        return res.status(200).json({ message: 'No changes were applied', article });
       }
+      
+      const updatedArticle = await Article.findById(req.params.id);
+      console.log('Updated article:', updatedArticle);
+      res.json(updatedArticle);
     } catch (error) {
       console.error('Error updating article:', error);
+      if (error.code === 11000) {
+        return res.status(400).json({ message: `Slug "${req.body.title ? slugify(req.body.title, { lower: true, strict: true }) : article.slug}" is already in use` });
+      }
       res.status(500).json({ message: 'Server error', error: error.message });
     }
   });
