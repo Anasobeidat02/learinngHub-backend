@@ -8,31 +8,34 @@ const prerender = require('prerender-node');
 
 // Connect to database
 connectDB();
-prerender.set('prerenderToken', process.env.PRERENDER_TOKEN);
 
+// تكوين Prerender بشكل أكثر تفصيلاً
+prerender.set('prerenderToken', process.env.PRERENDER_TOKEN)
+  .set('protocol', 'https')
+  .set('forwardHeaders', true)
+  .set('host', 'www.learnhubjo.com')
+  // تكوين التخزين المؤقت لتحسين الأداء
+  .set('beforeRender', function(req, done) {
+    // يمكن إضافة منطق التخزين المؤقت هنا
+    done();
+  })
+  .set('afterRender', function(err, req, prerender_res) {
+    // يمكن إضافة منطق التخزين المؤقت هنا
+    if (err) {
+      console.error('Prerender error:', err);
+      return { cancelRender: true };
+    }
+  });
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 console.log("MONGODB_URI =", process.env.MONGODB_URI);
 
-
-// Middleware 
-// const allowedOrigins = [
-//   'https://learinng-hub-fronend.vercel.app', 
-//   'http://localhost:8080',
-// ];
-
-// app.use(cors({
-//   origin: 'https://learinng-hub-fronend.vercel.app',
-//   credentials: true
-// }));
-app.use(cors()); // بدل الـ allowedOrigins
-
-app.use(express.json());
-app.use(prerender);
+// Middleware
+app.use(cors());
+app.use(prerender); // تأكد من أن prerender يتم استخدامه قبل أي middleware آخر
 
 app.use(express.static(path.join(__dirname, '../frontEnd/dist')));
-
  
 // Basic route
 app.get('/api/health', (req, res) => {
