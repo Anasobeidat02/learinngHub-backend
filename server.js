@@ -5,6 +5,7 @@ require('dotenv').config();
 const connectDB = require('./db/connection');
 const { protect } = require('./middleware/authMiddleware');
 const prerender = require('prerender-node');
+const path = require('path');
 
 // Connect to database
 connectDB();
