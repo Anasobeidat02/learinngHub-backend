@@ -31,7 +31,7 @@ app.use(cors()); // بدل الـ allowedOrigins
 app.use(express.json());
 app.use(prerender);
 
-app.use(express.static(path.join(__dirname, '../frontEnd/dist')));
+// app.use(express.static(path.join(__dirname, '../frontEnd/dist')));
 
  
 // Basic route
