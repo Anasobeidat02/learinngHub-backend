@@ -8,7 +8,7 @@ const prerender = require('prerender-node');
 
 // Connect to database
 connectDB();
-prerender.set('prerenderToken', process.env.PRERENDER_TOKEN);
+// prerender.set('prerenderToken', process.env.PRERENDER_TOKEN);
 
 
 const app = express();
@@ -29,7 +29,7 @@ console.log("MONGODB_URI =", process.env.MONGODB_URI);
 app.use(cors()); // بدل الـ allowedOrigins
 
 app.use(express.json());
-app.use(prerender);
+// app.use(prerender);
 
 // app.use(express.static(path.join(__dirname, '../frontEnd/dist')));
 
